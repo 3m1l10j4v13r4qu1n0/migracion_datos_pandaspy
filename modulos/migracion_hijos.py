@@ -1,8 +1,8 @@
 import pandas as pd 
 
 # Cargar los archivos Excel
-df_padres = pd.read_excel('tabla_padres.xlsx')
-df_hijos = pd.read_excel('tabla_hijos.xlsx')
+df_padres = pd.read_excel('servicios/input_datos/tabla_padres.xlsx')
+df_hijos = pd.read_excel('servicios/input_datos/tabla_hijos.xlsx')
 
 # Ordenar hijos por DNI del padre y fecha de nacimiento (para asignar hijo1, hijo2, etc.)
 df_hijos = df_hijos.sort_values(['dni_padre', 'fecha_nacimiento'])
@@ -33,12 +33,13 @@ def asignar_hijos(row):
     return row
 
 # Aplicar la función a cada fila del dataframe de padres
-df_padres_actualizado = df_padres.apply(asignar_hijos, axis=1)
+def actualizarDatos():
+    df_padres_actualizado = df_padres.apply(asignar_hijos, axis=1)
 
-# Guardar el resultado en un nuevo archivo Excel
-df_padres_actualizado.to_excel('tabla_padres_actualizada.xlsx', index=False)
+    # Guardar el resultado en un nuevo archivo Excel
+    df_padres_actualizado.to_excel('servicios/output_datos/tabla_padres_actualizada.xlsx', index=False)
 
-print("Migración completada. Resultado guardado en 'tabla_padres_actualizada.xlsx'")
+    return print("Migración completada. Resultado guardado en 'tabla_padres_actualizada.xlsx'")
 #print(df_padres)
 #print(df_hijos)
 
