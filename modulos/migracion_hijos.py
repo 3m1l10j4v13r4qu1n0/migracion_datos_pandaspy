@@ -23,9 +23,9 @@ columns_conyuges = df_conyuges.columns.tolist()
 
 #asignar clave primaria y clave foranea
 primary_key = columns_pesonales[0]
-hijos_foranea_key = columns_hijos[0]
+hijos_foranea_key = columns_hijos[1]
 laborales_foranea_key = columns_laborales[0]
-conyuges_foranea_key = columns_conyuges[0]
+conyuges_foranea_key = columns_conyuges[1]
 
 # Ordenar hijos por DNI del padre y fecha de nacimiento (para asignar hijo1, hijo2, etc.)
 df_hijos = df_hijos.sort_values(hijos_foranea_key)#(['dni_padre', 'fecha_nacimiento'])
@@ -52,7 +52,8 @@ def asignar_hijos(row):
                 row[col_fecha] = hijo['Fecha de Nacimiento:']
     
     return row
-# Ordenar datos laborales
+
+# Ordenar datos conyuges
 df_conyuges = df_conyuges.sort_values(conyuges_foranea_key)
 
 #Agrupar conyuges
@@ -73,30 +74,19 @@ def asignar_conyuges(row):
         row[col_fecha] = conyuge['Fecha  de Nacimiento:']
     
 
-
-# Crear DataFrame con nuevos datos
-# def crearDataFrame(df,archivo,hoja,encabezado):
-#     wb = load_workbook(archivo)
-#     ws = wb[hoja]
-#     # Escribir los datos manualmente a partir de la segunda fila
-#     for i, row in df.iterrows():
-#         ws.cell(row=i+1, column= i+1, value=row[encabezado[i+1]])  
-#         #ws.cell(row=i+1, column=2, value=row['Columna2'])  # Columna B
-
-#     # Guardar cambios
-#     wb.save(archivo)
     
 # Aplicar la función a cada fila del dataframe de padres
 def actualizarDatos():
-    df_padres.apply(asignar_hijos, axis=1)
-    df_padres.apply(asignar_conyuges, axis=1)
-    df_padron_actualizado = df_padres
-    # crearDataFrame(df=df_padres_actualizado,archivo=excel_arch_padre,
-    #                hoja=hoja_descarga,encabezado=encabezados)
+
+    df_completo = pd.merge(df_padres,df_laborales,on=primary_key)
+    df_completo.apply(asignar_hijos, axis=1)
+    df_completo.apply(asignar_conyuges, axis=1)
+    
 
     # Guardar el resultado en un nuevo archivo Excel
-    #df_padres_actualizado.to_excel('servicios/output_datos/tabla_padres_actualizada.xlsx', index=False)
+    df_completo.to_excel('servicios/output_datos/tabla_completa.xlsx', index=False)
+    
+    return print("Migración completada. Resultado guardado ")
+    
 
-    #return 
-    print("Migración completada. Resultado guardado en 'tabla_padres_actualizada.xlsx'")
-    return df_padron_actualizado
+
