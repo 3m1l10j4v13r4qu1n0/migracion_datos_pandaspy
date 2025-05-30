@@ -28,7 +28,7 @@ laborales_foranea_key = columns_laborales[0]
 conyuges_foranea_key = columns_conyuges[1]
 
 # Ordenar hijos por DNI del padre y fecha de nacimiento (para asignar hijo1, hijo2, etc.)
-df_hijos = df_hijos.sort_values(hijos_foranea_key)#(['dni_padre', 'fecha_nacimiento'])
+df_hijos = df_hijos.sort_values([hijos_foranea_key,columns_hijos[4]])#(['dni_padre', 'fecha_nacimiento'])
 
 # Agrupar hijos por padre
 grupo_hijos = df_hijos.groupby(hijos_foranea_key)
@@ -80,7 +80,7 @@ def actualizarDatos():
 
     df_completo = pd.merge(df_padres,df_laborales,on=primary_key)
     df_completo.apply(asignar_hijos, axis=1)
-    df_completo.apply(asignar_conyuges, axis=1)
+    #df_completo.apply(asignar_conyuges, axis=1)
     
 
     # Guardar el resultado en un nuevo archivo Excel
