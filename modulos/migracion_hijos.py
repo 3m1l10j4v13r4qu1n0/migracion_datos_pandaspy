@@ -2,6 +2,21 @@ import pandas as pd
 
 # --- FUNCIONES ---
 
+def marcar_pareja_e_hijos(df):
+    """
+    Marca con 1 si tiene pareja o hijos. 0 si no los tiene.
+    Usa texto 'no dato' como referencia de valor vacío.
+    """
+
+    # Marcar pareja solo si el texto no es 'no dato'
+    df['Esta En pareja? (Conyuge)'] = (df['Nombre y Apellido ( Conyuge ) :'] != 'no dato').astype(int)
+
+    # Marcar hijos: al menos uno de los campos no debe ser 'no dato'
+    df['hijo/s'] = (df['Apellido/s y Nombre/s hijo/a 1'] != 'no dato').astype(int)
+    
+    return df
+
+
 def limpiar_nulos_personalizada(df):
     """
     Reemplaza nulos según tipo:
@@ -47,6 +62,7 @@ def actualizarDatos():
         df_hijos = pd.read_excel('servicios/input_datos/padron.xlsx', sheet_name="hijos")
         df_laborales = pd.read_excel('servicios/input_datos/padron.xlsx', sheet_name="DatosLaborales")
         df_conyuges = pd.read_excel('servicios/input_datos/padron.xlsx', sheet_name="conyuges")
+        
     except Exception as e:
         print("Error al leer el archivo:", e)
         raise
@@ -56,6 +72,7 @@ def actualizarDatos():
     df_hijos = limpiar_nulos_personalizada(df_hijos)
     df_laborales = limpiar_nulos_personalizada(df_laborales)
     df_conyuges = limpiar_nulos_personalizada(df_conyuges)
+    
 
     # Procesar hijos
     df_hijos_pivot = procesar_hijos(df_hijos)
@@ -67,6 +84,7 @@ def actualizarDatos():
 
     if 'Clave_foranea:' in df_merged.columns:
         df_merged.drop(columns='Clave_foranea:', inplace=True)
+
 
     # Orden final de columnas
     ordenar_columns = [
@@ -91,9 +109,13 @@ def actualizarDatos():
     #Limpiar datos nulos de df_merged
     df_merged = limpiar_nulos_personalizada(df_merged)
     
+    # Marcar pareja e hijos
+    df_merged = marcar_pareja_e_hijos(df_merged)
+
     # Guardar archivo final
     df_merged[columnas_finales].to_excel('servicios/output_datos/tabla_padron_actualizado.xlsx', index=False)
     print("Migración completada. Resultado guardado.")
 
+    
 # --- EJECUTAR ---
 #actualizarDatos()
